@@ -1,7 +1,7 @@
 root_dir = "."
 
 [os.unix]
-dev = ["cd yaykeys && npm run tauri dev"]
+dev = ["npm run tauri dev"]
 
 [os.windows]
 dev = []

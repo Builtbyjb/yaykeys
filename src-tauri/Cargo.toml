@@ -1,7 +1,7 @@
 [package]
 name = "yaykeys"
 version = "0.1.0"
-description = "A Tauri App"
+description = "A light weight window manager for mac-book and windows computers"
 authors = ["you"]
 edition = "2021"
 
