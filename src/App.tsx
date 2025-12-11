@@ -6,11 +6,16 @@ import "./App.css";
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
+  const [apps, setApps] = useState<string[]>([]);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setGreetMsg(await invoke("greet", { name }));
   }
+
+  const get = async () => {
+    setApps(await invoke("get"));
+  };
 
   return (
     <main className="container">
@@ -29,6 +34,14 @@ function App() {
       </div>
       <p>Click on the Tauri, Vite, and React logos to learn more.</p>
 
+      {apps.length > 0 && (
+        <div>
+          {apps.map((app) => (
+            <p>{app}</p>
+          ))}
+        </div>
+      )}
+
       <form
         className="row"
         onSubmit={(e) => {
@@ -44,6 +57,7 @@ function App() {
         <button type="submit">Greet</button>
       </form>
       <p>{greetMsg}</p>
+      <button onClick={get}>Get</button>
     </main>
   );
 }
