@@ -1,0 +1,12 @@
+root_dir = "."
+
+[os.unix]
+dev = ["cd yaykeys && npm run tauri dev"]
+
+[os.windows]
+dev = []
+
+[exclude]
+dir = [".git"]
+file = []
+ext = ["toml"]
