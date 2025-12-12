@@ -6,19 +6,19 @@ use std::sync::Mutex;
 use tauri::Manager;
 use utils::state::AppState;
 use utils::storage;
-use utils::types::App;
+use utils::types::Setting;
 
 #[tauri::command]
-fn get() -> Vec<String> {
+fn get_settings(state: tauri::State<'_, AppState>) -> Vec<String> {
     #[cfg(target_os = "macos")]
-    let apps: Vec<String> = macos::fetch::fetch();
+    let apps: Vec<String> = macos::fetch::fetch(state);
     //
     return apps;
 }
 
 #[tauri::command]
-fn search(name: &str) -> Vec<App> {
-    let apps: Vec<App> = vec![];
+fn search(name: &str) -> Vec<Setting> {
+    let apps: Vec<Setting> = vec![];
     return apps;
 }
 
@@ -39,7 +39,7 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get])
+        .invoke_handler(tauri::generate_handler![get_settings])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
