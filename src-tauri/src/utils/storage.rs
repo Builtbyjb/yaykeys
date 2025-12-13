@@ -1,10 +1,9 @@
-use crate::utils;
+use crate::types;
 
-use rusqlite::Connection;
+use rusqlite::{Connection, Result};
 use std::path::PathBuf;
 use tauri::Manager;
-use utils::state::AppState;
-use utils::types;
+use types::setting::Setting;
 
 fn get_db_path(app: &tauri::App) -> PathBuf {
     let mut path = app
@@ -22,18 +21,15 @@ pub fn init_db(app: &tauri::App) -> Connection {
     let db_path = get_db_path(app);
     let conn = Connection::open(db_path).expect("Failed to open database");
 
-    // Schema:
-    // name
-    // app_type
-    // path
-    // hotkey
-    // option
-    // enabled
     conn.execute(
         "CREATE TABLE IF NOT EXISTS settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            key TEXT NOT NULL UNIQUE,
-            value TEXT NOT NULL
+            name TEXT NOT NULL UNIQUE,
+            hotkey TEXT NOT NULL,
+            app_type TEXT NOT NULL,
+            exe_path TEXT NOT NULL,
+            mode TEXT NOT NULL,
+            enabled BOOLEAN NOT NULL
         )",
         [],
     )
@@ -42,23 +38,27 @@ pub fn init_db(app: &tauri::App) -> Connection {
     conn
 }
 
-pub fn get_all(state: tauri::State<'_, AppState>) {
-    let db = state.db.lock().unwrap();
+pub fn get_all_settings(conn: &Connection) -> Result<Vec<Setting>, rusqlite::Error> {
+    let mut stmt = conn.prepare("SELECT * FROM settings").unwrap();
+
+    let settings = stmt
+        .query_map([], |row| {
+            let exe_path: String = row.get(4).unwrap();
+            Ok(Setting::from_db(
+                row.get(1).unwrap(),
+                row.get(2).unwrap(),
+                row.get(3).unwrap(),
+                PathBuf::from(exe_path),
+                row.get(5).unwrap(),
+                row.get(6).unwrap(),
+            ))
+        })
+        .unwrap()
+        .collect::<Result<Vec<Setting>>>()
+        .unwrap();
+
+    Ok(settings)
 }
-
-pub fn get() {}
-
-pub fn set(setting: types::Setting) {
-    // Adds a new app setting
-}
-
-pub fn update() {}
-
-pub fn search() {}
-
-pub fn delete() {}
 
 // Cloud sync
 pub fn sync_all() {}
-
-pub fn sync() {}

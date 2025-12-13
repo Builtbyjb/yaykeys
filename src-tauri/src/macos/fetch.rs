@@ -1,11 +1,12 @@
+use crate::types;
 use crate::utils;
 
 use std::fs;
 use std::path::Path;
+use types::app::App;
+use types::setting::Setting;
 use utils::db_state;
 use utils::state::AppState;
-use utils::storage;
-use utils::types::{App, Setting};
 
 pub fn fetch(state: tauri::State<'_, AppState>) -> Vec<Setting> {
     let dirs = [
@@ -21,32 +22,9 @@ pub fn fetch(state: tauri::State<'_, AppState>) -> Vec<Setting> {
     ];
 
     let apps = get_apps(&dirs);
-    let (new_apps, deleted_apps) = db_state::get_db_state(state, &apps).unwrap();
+    let settings: Vec<Setting> = db_state::get_db_state(state, &apps).unwrap();
 
-    if new_apps.len() > 0 {
-        // pub struct Setting {
-        //     name: String,
-        //     hotkey: String,
-        //     app_type: String,
-        //     path: String,
-        //     option: String,
-        //     enabled: bool,
-        // }
-        for new_app in new_apps {
-            let name = new_app;
-            storage::set()
-        }
-    }
-
-    if deleted_apps.len() > 0 {
-        // Remove deleted apps from database
-    }
-
-    // Get all settings
-
-    // Return all settings
-
-    return apps;
+    settings
 }
 
 fn get_apps(dirs: &[&str]) -> Vec<App> {

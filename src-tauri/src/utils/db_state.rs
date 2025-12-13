@@ -1,48 +1,66 @@
+use std::path::{Path, PathBuf};
+
+use crate::types;
 use crate::utils;
 
 use rusqlite::Result;
+use types::app::App;
+use types::setting::Setting;
 use utils::state::AppState;
-use utils::types::App;
+use utils::storage;
 
 pub fn get_db_state(
     state: tauri::State<'_, AppState>,
     apps: &Vec<App>,
-) -> Result<(Vec<String>, Vec<String>), rusqlite::Error> {
-    // Returns a list of newly added apps and delete apps
-    let db = state.db.lock().unwrap();
+) -> Result<Vec<Setting>, rusqlite::Error> {
+    let conn = state.conn.lock().unwrap();
 
     // Create temporary table
-    db.execute("CREATE TEMP TABLE name_list", []).unwrap();
+    conn.execute("CREATE TEMP TABLE name_list (name TEXT NOT NULL)", [])
+        .expect("Failed to create temp table");
 
-    let mut stmt = db.prepare("INSERT INTO name_list VALUES(?)").unwrap();
+    let mut stmt = conn.prepare("INSERT INTO name_list VALUES(?)").unwrap();
     for app in apps {
         stmt.execute(&[app.name()]).unwrap();
     }
     drop(stmt);
 
+    // Delete the names in table but not in list
+    let mut stmt = conn
+        .prepare("SELECT name FROM settings WHERE name NOT IN (SELECT name FROM name_list)")
+        .unwrap();
+    stmt.raw_execute().unwrap();
+
     // Find name in list but not in table
-    let query_in_list_only =
-        "SELECT name FROM name_list WHERE name NOT IN (SELECT name FROM settings)";
+    for app in apps {
+        let mut stmt = conn
+            .prepare("SELECT name FROM settings WHERE name= ?")
+            .unwrap();
 
-    let mut stmt = db.prepare(&query_in_list_only).unwrap();
-    let new_apps = stmt
-        .query_map([], |row| row.get(0))
-        .unwrap()
-        .collect::<Result<Vec<String>>>()
-        .unwrap();
+        let mut rows = stmt.query(&[app.name()]).unwrap();
 
-    // Find names in table but not in list
-    let query_in_table_only =
-        "SELECT name FROM settings WHERE name NOT IN (SELECT name FROM name_list)";
+        match rows.next() {
+            Ok(Some(_)) => {
+                // println!("App Exists")
+            }
+            Ok(None) => {
+                let exe_path = get_exe_path(app.folder_path(), app.name());
+                let setting = Setting::new(app.name().to_string(), PathBuf::from(exe_path));
+                setting.insert(&conn).unwrap()
+            }
+            Err(_) => {
+                println!("Here Err");
+            }
+        }
+    }
 
-    let mut stmt = db.prepare(&query_in_table_only).unwrap();
-    let deleted_apps = stmt
-        .query_map([], |row| row.get(0))
-        .unwrap()
-        .collect::<Result<Vec<String>>>()
-        .unwrap();
+    conn.execute("DROP TABLE name_list", []).unwrap();
 
-    db.execute("DROP TABLE name_list", []).unwrap();
+    let settings = storage::get_all_settings(&conn).unwrap();
 
-    Ok((new_apps, deleted_apps))
+    Ok(settings)
+}
+
+fn get_exe_path(folder_path: &Path, name: &str) -> String {
+    format!("{}/Contents/MacOs/{}", folder_path.to_str().unwrap(), name).to_string()
 }
