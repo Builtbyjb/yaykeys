@@ -1,21 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
+type Setting = {
+  name: String;
+  hotkey: String;
+  app_type: String;
+  exe_path: String;
+  mode: String;
+  enabled: boolean;
+};
+
+// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-  const [apps, setApps] = useState<string[]>([]);
+  const [apps, setApps] = useState<Setting[]>([]);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
-  const get = async () => {
-    setApps(await invoke("get"));
+  const fetchAll = async () => {
+    setApps(await invoke("get_settings"));
   };
+
+  useEffect(() => {
+    fetchAll();
+  }, []);
 
   return (
     <main className="container">
@@ -37,27 +44,14 @@ function App() {
       {apps.length > 0 && (
         <div>
           {apps.map((app) => (
-            <p>{app}</p>
+            <div>
+              <p>{app.name}</p>
+              <p>{app.exe_path}</p>
+              <p>{app.app_type}</p>
+            </div>
           ))}
         </div>
       )}
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-      <button onClick={get}>Get</button>
     </main>
   );
 }

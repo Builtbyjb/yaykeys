@@ -1,49 +1,48 @@
+use crate::types;
 use crate::utils;
 
 use std::fs;
 use std::path::Path;
-use utils::types::App;
+use types::app::App;
+use types::setting::Setting;
+use utils::db_state;
+use utils::state::AppState;
 
-pub fn fetch() -> Vec<String> {
-    // Fresh the system
-
-    // Check for new apps
-    // Check for deleted apps
-
-    // update app struct
-    let mut apps: Vec<String> = Vec::new();
-    let app_dirs = [
+pub fn fetch(state: tauri::State<'_, AppState>) -> Vec<Setting> {
+    let dirs = [
         "/Applications",
         "/Applications/Utilities",
+        // "/Applications/Python 3.14",
         "/System/Applications",
         "/System/Applications/Utilities",
+        // "/System/Library/CoreServices",
+        "/System/Library/CoreServices/Applications",
+        "/System/Library/CoreServices/Finder.app/Contents/Applications",
+        "/System/Volumes/Preboot/Cryptexes/App/System/Applications",
     ];
 
-    // System applications
-    let system_apps = Path::new("/System/Applications");
-    if let Ok(entries) = fs::read_dir(system_apps) {
-        for entry in entries.flatten() {
-            if let Some(name) = entry.file_name().to_str() {
-                if name.ends_with(".app") {
-                    apps.push(name.to_string())
+    let apps = get_apps(&dirs);
+    let settings: Vec<Setting> = db_state::get_db_state(state, &apps).unwrap();
+
+    settings
+}
+
+fn get_apps(dirs: &[&str]) -> Vec<App> {
+    let mut apps: Vec<App> = Vec::new();
+
+    for dir in dirs {
+        let path = Path::new(dir);
+        if let Ok(entries) = fs::read_dir(path) {
+            for entry in entries.flatten() {
+                if let Some(name) = entry.file_name().to_str() {
+                    if name.ends_with(".app") {
+                        let app_name = name.strip_suffix(".app").unwrap();
+                        apps.push(App::new(app_name.to_owned(), path.to_path_buf()))
+                    }
                 }
             }
         }
     }
 
-    // User applications
-    // if let Some(home) = dirs::home_dir() {
-    //     let user_apps = home.join("Applications");
-    //     if let Ok(entries) = fs::read_dir(user_apps) {
-    //         for entry in entries.flatten() {
-    //             if let Some(name) = entry.file_name().to_str() {
-    //                 if name.ends_with(".app") {
-    //                     apps.push(name.to_string())
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
-    return apps;
+    apps
 }

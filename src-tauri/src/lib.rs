@@ -1,24 +1,25 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod macos;
+mod types;
 mod utils;
 
 use std::sync::Mutex;
 use tauri::Manager;
+use types::setting::Setting;
 use utils::state::AppState;
 use utils::storage;
-use utils::types::App;
 
 #[tauri::command]
-fn get() -> Vec<String> {
+fn get_settings(state: tauri::State<'_, AppState>) -> Vec<Setting> {
     #[cfg(target_os = "macos")]
-    let apps: Vec<String> = macos::fetch::fetch();
-    //
+    let apps = macos::fetch::fetch(state);
+
     return apps;
 }
 
 #[tauri::command]
-fn search(name: &str) -> Vec<App> {
-    let apps: Vec<App> = vec![];
+fn search(name: &str) -> Vec<Setting> {
+    let apps: Vec<Setting> = vec![];
     return apps;
 }
 
@@ -34,12 +35,12 @@ pub fn run() {
         .setup(|app| {
             let conn = storage::init_db(app);
             app.manage(AppState {
-                db: Mutex::new(conn),
+                conn: Mutex::new(conn),
             });
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get])
+        .invoke_handler(tauri::generate_handler![get_settings])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
