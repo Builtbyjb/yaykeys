@@ -22,18 +22,39 @@ function Index() {
   }, []);
 
   return (
-    <main className="">
-      {apps.length > 0 && (
-        <div>
-          {apps.map((app) => (
-            <div>
-              <p>{app.name}</p>
-              <p>{app.exe_path}</p>
-              <p>{app.app_type}</p>
-            </div>
-          ))}
-        </div>
-      )}
+    <main>
+      <div className="mb-4">
+        <input type="text" placeholder="Search" className="border-gray-400" />
+        <ul>
+          <li>Applications</li>
+          <li>Window Commands</li>
+        </ul>
+      </div>
+      <div className="overflow-y-auto bg-amber-100 max-h-screen">
+        <table>
+          {/*Table header*/}
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Hotkey</th>
+            <th>Mode</th>
+            <th>Enabled</th>
+          </tr>
+          {apps.length > 0 && (
+            <>
+              {apps.map((app) => (
+                <tr className="pb-4">
+                  <td>{app.name}</td>
+                  <td>{app.app_type}</td>
+                  <td>{app.hotkey ? app.hotkey : "Input Hotkey"}</td>
+                  <td>{app.mode}</td>
+                  <td>{app.enabled ? "True" : "False"}</td>
+                </tr>
+              ))}
+            </>
+          )}
+        </table>
+      </div>
     </main>
   );
 }
