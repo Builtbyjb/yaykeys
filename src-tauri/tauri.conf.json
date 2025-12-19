@@ -14,8 +14,8 @@
       {
         "title": "Yaykeys",
         "width": 700,
-        "height": 600,
-        "resizable": true,
+        "height": 700,
+        "resizable": false,
         "fullscreen": false
       }
     ],

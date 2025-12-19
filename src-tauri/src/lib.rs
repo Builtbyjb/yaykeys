@@ -13,7 +13,6 @@ use utils::storage;
 fn get_settings(state: tauri::State<'_, AppState>) -> Vec<Setting> {
     #[cfg(target_os = "macos")]
     let apps = macos::fetch::fetch(state);
-
     return apps;
 }
 

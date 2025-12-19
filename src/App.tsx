@@ -7,9 +7,9 @@ function App() {
     <div className="p-4 overflow-y-auto h-screen">
       <header className="mb-4 border-b border-gray">
         {/*Icon*/}
-        <p>Johndoe@yaykeys.app</p>
-        <span>Beta</span>
+        {/* <p>Johndoe@yaykeys.app</p> */}
         <p>version 0.1.0</p>
+        <span>Beta</span>
       </header>
       <Index />
     </div>
