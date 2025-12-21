@@ -17,9 +17,8 @@ function Index() {
     fetchAll();
   }, []);
 
-  const handleActiveFilter = () => {
-
-  }
+  // const handleActiveFilter = () => {
+  // }
 
   return (
     <main>
