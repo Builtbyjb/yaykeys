@@ -39,6 +39,12 @@ function Index() {
       .catch((err) => console.log(err));
   };
 
+  const handleModeSelect = async (event: any, id: number) => {
+    if (event.target) {
+      await invoke("update_mode", { id: id, value: event.target.value });
+    }
+  };
+
   return (
     <main>
       <div className="mb-4 flex items-center gap-8">
@@ -68,18 +74,20 @@ function Index() {
                   <td>{app.name}</td>
                   <td>{app.hotkey ? app.hotkey : "Input Hotkey"}</td>
                   <td>
-                    {/* TODO: Select field*/}
-                    {app.mode}
+                    <select onChange={(event) => handleModeSelect(event, app.id)}>
+                      <option value="Default" selected={app.mode === "Default"}>
+                        Default
+                      </option>
+                      <option value="FullScreen" selected={app.mode === "FullScreen"}>
+                        Full Screen
+                      </option>
+                      <option value="Desktop" selected={app.mode === "Desktop"}>
+                        Desktop
+                      </option>
+                    </select>
                   </td>
                   <td>
-                    {/*
-                      NOTE:
-                      */}
-                    <input
-                      type="checkbox"
-                      checked={app.enabled}
-                      onClick={(event) => handleEnabledApp(event, app.id)}
-                    />
+                    <input type="checkbox" checked={app.enabled} onClick={(event) => handleEnabledApp(event, app.id)} />
                   </td>
                 </tr>
               ))}
