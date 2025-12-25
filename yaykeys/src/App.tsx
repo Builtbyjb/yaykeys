@@ -7,11 +7,11 @@ function App() {
     <div className="p-4 overflow-y-auto h-screen">
       <header className="mb-4 border-b border-gray">
         {/*Icon*/}
-        {/* <p>Johndoe@yaykeys.app</p> */}
-        <p>version 0.1.0</p>
+        <p>Johndoe@yaykeys.app</p>
         <span>Beta</span>
       </header>
       <Index />
+      <p className="text-sm mt-2 italic">version 0.1.0</p>
     </div>
   );
 }

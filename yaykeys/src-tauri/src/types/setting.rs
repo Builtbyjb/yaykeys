@@ -31,7 +31,7 @@ impl Setting {
         }
     }
 
-    pub fn get() {}
+    // pub fn get() {}
 
     pub fn insert(conn: &Connection, name: String, exe_path: PathBuf) -> Result<()> {
         conn.execute(
@@ -42,11 +42,11 @@ impl Setting {
         Ok(())
     }
 
-    pub fn update() {}
+    // pub fn update() {}
 
-    pub fn delete() {}
+    // pub fn delete() {}
 
-    pub fn search() {}
+    // pub fn search() {}
 
-    pub fn sync() {}
+    // pub fn sync() {}
 }

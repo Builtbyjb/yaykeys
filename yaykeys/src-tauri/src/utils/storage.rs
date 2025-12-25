@@ -60,4 +60,4 @@ pub fn get_all_settings(conn: &Connection) -> Result<Vec<Setting>, rusqlite::Err
 }
 
 // Cloud sync
-pub fn sync_all() {}
+// pub fn sync_all() {}

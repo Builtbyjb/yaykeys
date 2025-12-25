@@ -14,20 +14,23 @@ function Index() {
     fetchAll();
   }, []);
 
-  // const handleActiveFilter = () => {
-  // }
-
-  const handleEnabledApp = (event: any, id: number) => {
-    const updatedApps = apps.map((app) => {
-      console.log("App id: ", app.id);
-      console.log("ID: ", id);
+  const handleEnabledApp = async (event: any, id: number) => {
+    const updatedApps = apps.map(async (app) => {
       if (app.id === id) {
-        if (event.target) app.enabled = event.currentTarget.checked;
+        if (event.target) {
+          app.enabled = event.currentTarget.checked;
+          await invoke("update_enabled", {
+            id: app.id,
+            value: app.enabled,
+          });
+        }
       }
       return app;
     });
 
-    setApps(updatedApps);
+    Promise.all(updatedApps)
+      .then((result) => setApps(result))
+      .catch((err) => console.log(err));
   };
 
   return (

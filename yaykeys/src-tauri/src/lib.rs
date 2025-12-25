@@ -23,8 +23,20 @@ fn search(name: &str) -> Vec<Setting> {
 }
 
 #[tauri::command]
-fn update() -> bool {
-    //
+fn update_enabled(id: u16, value: bool) -> bool {
+    println!("id: {}; value: {}", id, value);
+    true
+}
+
+#[tauri::command]
+fn update_mode(id: u16, value: &str) -> bool {
+    println!("id: {}; value: {}", id, value);
+    true
+}
+
+#[tauri::command]
+fn update_hotkey(id: u16, value: &str) -> bool {
+    println!("id: {}; value: {}", id, value);
     true
 }
 
@@ -39,7 +51,13 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_settings])
+        .invoke_handler(tauri::generate_handler![
+            get_settings,
+            search,
+            update_enabled,
+            update_mode,
+            update_hotkey
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
