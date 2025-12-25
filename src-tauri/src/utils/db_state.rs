@@ -40,15 +40,13 @@ pub fn get_db_state(
         let mut rows = stmt.query([app.name()]).unwrap();
 
         match rows.next() {
-            Ok(Some(_)) => {
-                // println!("App Exists")
-            }
+            Ok(Some(_)) => {} // Application exists
             Ok(None) => {
                 let exe_path = get_exe_path(app.folder_path(), app.name());
-                let setting = Setting::new(app.name().to_string(), PathBuf::from(exe_path));
-                setting.insert(&conn).unwrap()
+                Setting::insert(&conn, app.name().to_string(), PathBuf::from(exe_path)).unwrap();
             }
             Err(_) => {
+                // Handle if an error occurs
                 println!("Here Err");
             }
         }

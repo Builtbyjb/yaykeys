@@ -4,38 +4,27 @@ use std::path::PathBuf;
 
 #[derive(Debug, Serialize)]
 pub struct Setting {
+    id: u16,
     name: String,
-    hotkey: String,
-    app_type: String,
+    hotkey: Option<String>,
     exe_path: PathBuf,
     mode: String,
     enabled: bool,
 }
 
 impl Setting {
-    pub fn new(name: String, exe_path: PathBuf) -> Self {
-        Self {
-            name,
-            hotkey: "".to_string(),
-            app_type: "Application".to_string(),
-            exe_path,
-            mode: "default".to_string(),
-            enabled: true,
-        }
-    }
-
     pub fn from_db(
+        id: u16,
         name: String,
-        hotkey: String,
-        app_type: String,
+        hotkey: Option<String>,
         exe_path: PathBuf,
         mode: String,
         enabled: bool,
     ) -> Self {
         Self {
+            id,
             name,
             hotkey,
-            app_type,
             exe_path,
             mode,
             enabled,
@@ -44,17 +33,10 @@ impl Setting {
 
     pub fn get() {}
 
-    pub fn insert(&self, conn: &Connection) -> Result<()> {
+    pub fn insert(conn: &Connection, name: String, exe_path: PathBuf) -> Result<()> {
         conn.execute(
-            "INSERT INTO settings (name, hotkey, app_type, exe_path, mode, enabled) VALUES ( ?, ?, ?, ?, ?, ?)",
-            params![
-                self.name,
-                self.hotkey,
-                self.app_type,
-                self.exe_path.to_str(),
-                self.mode,
-                self.enabled
-            ],
+            "INSERT INTO settings (name, exe_path) VALUES ( ?, ?)",
+            params![name, exe_path.to_str()],
         )
         .unwrap();
         Ok(())

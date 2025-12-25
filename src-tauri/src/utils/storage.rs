@@ -25,11 +25,10 @@ pub fn init_db(app: &tauri::App) -> Connection {
         "CREATE TABLE IF NOT EXISTS settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE,
-            hotkey TEXT NOT NULL,
-            app_type TEXT NOT NULL,
+            hotkey TEXT DEFAULT NULL,
             exe_path TEXT NOT NULL,
-            mode TEXT NOT NULL,
-            enabled BOOLEAN NOT NULL
+            mode TEXT NOT NULL DEFAULT 'Default',
+            enabled BOOLEAN NOT NULL DEFAULT TRUE
         )",
         [],
     )
@@ -43,14 +42,14 @@ pub fn get_all_settings(conn: &Connection) -> Result<Vec<Setting>, rusqlite::Err
 
     let settings = stmt
         .query_map([], |row| {
-            let exe_path: String = row.get(4).unwrap();
+            let exe_path: String = row.get(3).unwrap();
             Ok(Setting::from_db(
+                row.get(0).unwrap(),
                 row.get(1).unwrap(),
                 row.get(2).unwrap(),
-                row.get(3).unwrap(),
                 PathBuf::from(exe_path),
+                row.get(4).unwrap(),
                 row.get(5).unwrap(),
-                row.get(6).unwrap(),
             ))
         })
         .unwrap()
