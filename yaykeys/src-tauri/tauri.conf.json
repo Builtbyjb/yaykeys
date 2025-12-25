@@ -12,9 +12,11 @@
   "app": {
     "windows": [
       {
-        "title": "yaykeys",
-        "width": 800,
-        "height": 600
+        "title": "Yaykeys",
+        "width": 700,
+        "height": 700,
+        "resizable": false,
+        "fullscreen": false
       }
     ],
     "security": {

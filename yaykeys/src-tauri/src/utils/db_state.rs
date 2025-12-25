@@ -21,13 +21,13 @@ pub fn get_db_state(
 
     let mut stmt = conn.prepare("INSERT INTO name_list VALUES(?)").unwrap();
     for app in apps {
-        stmt.execute(&[app.name()]).unwrap();
+        stmt.execute([app.name()]).unwrap();
     }
     drop(stmt);
 
     // Delete the names in table but not in list
     let mut stmt = conn
-        .prepare("SELECT name FROM settings WHERE name NOT IN (SELECT name FROM name_list)")
+        .prepare("DELETE FROM settings WHERE name NOT IN (SELECT name FROM name_list)")
         .unwrap();
     stmt.raw_execute().unwrap();
 
@@ -37,18 +37,16 @@ pub fn get_db_state(
             .prepare("SELECT name FROM settings WHERE name= ?")
             .unwrap();
 
-        let mut rows = stmt.query(&[app.name()]).unwrap();
+        let mut rows = stmt.query([app.name()]).unwrap();
 
         match rows.next() {
-            Ok(Some(_)) => {
-                // println!("App Exists")
-            }
+            Ok(Some(_)) => {} // Application exists
             Ok(None) => {
                 let exe_path = get_exe_path(app.folder_path(), app.name());
-                let setting = Setting::new(app.name().to_string(), PathBuf::from(exe_path));
-                setting.insert(&conn).unwrap()
+                Setting::insert(&conn, app.name().to_string(), PathBuf::from(exe_path)).unwrap();
             }
             Err(_) => {
+                // Handle if an error occurs
                 println!("Here Err");
             }
         }
