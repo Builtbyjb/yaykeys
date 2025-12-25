@@ -14,6 +14,12 @@ function Index() {
     fetchAll();
   }, []);
 
+  const handleSearch = async (event: any) => {
+    if (event.target) {
+      setApps(await invoke("search", { query: event.target.value }));
+    }
+  };
+
   const handleEnabledApp = async (event: any, id: number) => {
     const updatedApps = apps.map(async (app) => {
       if (app.id === id) {
@@ -41,6 +47,7 @@ function Index() {
           <input
             type="text"
             placeholder="Search..."
+            onChange={(event) => handleSearch(event)}
             className="w-50 h-8 border rounded-xl border-neutral-400 bg-neutral-100 pl-9 text-sm text-neutral-700 placeholder:text-neutral-500"
           />
         </div>

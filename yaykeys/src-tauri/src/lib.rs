@@ -17,8 +17,9 @@ fn get_settings(state: tauri::State<'_, AppState>) -> Vec<Setting> {
 }
 
 #[tauri::command]
-fn search(name: &str) -> Vec<Setting> {
-    let apps: Vec<Setting> = vec![];
+fn search(state: tauri::State<'_, AppState>, query: &str) -> Vec<Setting> {
+    let conn = state.conn.lock().unwrap();
+    let apps: Vec<Setting> = storage::search(&conn, query).unwrap();
     return apps;
 }
 

@@ -6,10 +6,7 @@ use tauri::Manager;
 use types::setting::Setting;
 
 fn get_db_path(app: &tauri::App) -> PathBuf {
-    let mut path = app
-        .path()
-        .app_data_dir()
-        .expect("Failed to get app data directory");
+    let mut path = app.path().app_data_dir().expect("Failed to get app data directory");
 
     std::fs::create_dir_all(&path).expect("Failed to create app data directory");
     path.push("yaykeys.db");
@@ -42,6 +39,29 @@ pub fn get_all_settings(conn: &Connection) -> Result<Vec<Setting>, rusqlite::Err
 
     let settings = stmt
         .query_map([], |row| {
+            let exe_path: String = row.get(3).unwrap();
+            Ok(Setting::from_db(
+                row.get(0).unwrap(),
+                row.get(1).unwrap(),
+                row.get(2).unwrap(),
+                PathBuf::from(exe_path),
+                row.get(4).unwrap(),
+                row.get(5).unwrap(),
+            ))
+        })
+        .unwrap()
+        .collect::<Result<Vec<Setting>>>()
+        .unwrap();
+
+    Ok(settings)
+}
+
+pub fn search(conn: &Connection, query: &str) -> Result<Vec<Setting>, rusqlite::Error> {
+    let mut stmt = conn.prepare("SELECT * FROM settings WHERE name LIKE ?1").unwrap();
+    let search_pattern = format!("%{}%", query);
+
+    let settings = stmt
+        .query_map([&search_pattern], |row| {
             let exe_path: String = row.get(3).unwrap();
             Ok(Setting::from_db(
                 row.get(0).unwrap(),
