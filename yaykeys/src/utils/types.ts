@@ -1,9 +1,9 @@
 export type Setting = {
   id: number;
-  name: String;
-  hotkey: String;
-  app_type: String;
-  exe_path: String;
-  mode: String;
+  name: string;
+  hotkey: string;
+  app_type: string;
+  exe_path: string;
+  mode: string;
   enabled: boolean;
 };

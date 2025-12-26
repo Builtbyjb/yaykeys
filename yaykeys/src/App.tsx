@@ -5,7 +5,7 @@ import Index from "./views/Index";
 function App() {
   return (
     <div className="p-4 overflow-y-auto h-screen">
-      <header className="mb-4 border-b border-gray">
+      <header className="mb-4 border-b border-gray text-sm">
         {/*Icon*/}
         <p>Johndoe@yaykeys.app</p>
         <span>Beta</span>

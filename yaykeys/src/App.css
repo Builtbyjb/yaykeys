@@ -1,22 +1,27 @@
 @import "tailwindcss";
 
+@theme {
+    --color-popup: #000;
+}
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --color-background: #1a1a1a; 
+        --color-background: #1a1a1a;
         --color-text: #fff;
+        --color-hover: ;
     }
 }
 
 @media (prefers-color-scheme: light) {
     :root {
-        --color-background: #fff; 
+        --color-background: #fff;
         --color-text: #1a1a1a;
+        --color-hover: ;
     }
 }
 
 body {
     overflow: hidden;
     background-color: var(--color-background);
-    color: var(--color-text)
+    color: var(--color-text);
 }
